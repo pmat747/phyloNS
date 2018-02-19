@@ -4,11 +4,11 @@ Title: Nested Sampling for phylogenetics
 Version: 0.1.0
 Author: Patricio Maturana Russel
 Maintainer: The package maintainer <p.russel@auckland.ac.nz>
-Description: This R package allows the use of Nested Sampling (NS) in 
-             phylogenetics for the fixed tree topology case.  NS is mainly used
-             to estimate the marginal likelihood, quantity used for model selection 
-             under a Bayesian framework, but can also be used to get samples from the 
-             posterior distribution.
+Description: This R package allows the use of Nested Sampling (NS) 
+             in phylogenetics for the fixed and variable tree topology cases.
+             NS is mainly used to estimate the marginal likelihood, quantity 
+             used for model selection under a Bayesian framework, but can 
+             also be used to get samples from the posterior distribution.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true

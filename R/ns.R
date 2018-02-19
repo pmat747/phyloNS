@@ -12,11 +12,11 @@
 ##### log(x+y)=log(x)+log(y) #####
 ##################################
 
-log.plus <- function(x,y)
-{
-  if(x>y) x + log(1+exp(y-x))
-  else    y + log(1+exp(x-y))
-}
+# log.plus <- function(x,y)
+# {
+#   if(x>y) x + log(1+exp(y-x))
+#   else    y + log(1+exp(x-y))
+# }
 
 ##############
 ### Priors ###
@@ -635,11 +635,16 @@ ns = function( data, tree, N = 5, k = 4,
 
   }
 
-  # Naming posterior samples
+  # Naming posterior samples & discarded points
   colnames(sampled_par) = c('lambda', 'freqA', 'freqC', 'freqG', 'freqT',
                             'qCA', 'qGA', 'qTA', 'qGC', 'qTC', 'qTG',
                             'phi', 'mu',
                             paste(rep('t', n_brs), 1:n_brs, sep = ""));
+
+  colnames(dTheta) = c('lambda', 'freqA', 'freqC', 'freqG', 'freqT',
+                       'qCA', 'qGA', 'qTA', 'qGC', 'qTC', 'qTG',
+                       'phi', 'mu',
+                        paste(rep('t', n_brs), 1:n_brs, sep = ""));
 
   ###
 
@@ -650,6 +655,8 @@ ns = function( data, tree, N = 5, k = 4,
   ### Plots ###
 
   if(act_plot){
+
+    par(mar = c(4,4,4,4));
 
     plot(logX, logLd, xlab = expression("log"* xi), ylab='log(L)', pch='.');
 
@@ -664,12 +671,17 @@ ns = function( data, tree, N = 5, k = 4,
 
   }
 
+  # Storing process info
+  info = list(N = N, k = k, a = a, b = b, al = al, bl = bl,
+              step = step, model = model, tree = tree, ns = "fixed_tree");
+
   return(list(logZ = logZ, logZc = logZc,
               sd_logZ = sqrt(H / N),
               H = H, iter = iter, time = time,
               logX = logX, logLd = logLd,
               Lw.z = Lw.z, seq_lz = s_z[-1],
-              dTheta = dTheta, sampled_par = sampled_par) )
+              dTheta = dTheta, sampled_par = sampled_par,
+              info = info))
 }
 
 ###########
