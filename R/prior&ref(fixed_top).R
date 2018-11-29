@@ -21,11 +21,11 @@ dprior_JC = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b));
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b));
 
 }
 
@@ -35,12 +35,12 @@ dpseprior_JC = function(vec, ref_par, ref_trees){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) );
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) );
 
 }
 
@@ -54,11 +54,11 @@ dprior_HKY = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b)) +
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b)) +
 
     # Rates: q = vec[7] (HKY); phi = vec[12];
 
@@ -76,20 +76,20 @@ dpseprior_HKY = function(vec, ref_par){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
 
     # Rates: q = vec[7];
 
-    dgamma(vec[7], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE) +
+    stats::dgamma(vec[7], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE) +
 
     # rate mean: phi = vec[12]
 
-    dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
+    stats::dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
 
     # Frequencies: vec[2:5]
 
@@ -108,11 +108,11 @@ dprior_GTR = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
 
     # Rates: q = vec[6:10] (GTR); phi = vec[12];
 
@@ -130,20 +130,20 @@ dpseprior_GTR = function(vec, ref_par){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
 
     # Rates: q = vec[6:10] (GTR)
 
-    sum(dgamma(vec[6:10], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE)) +
+    sum(stats::dgamma(vec[6:10], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE)) +
 
     # rate mean: phi = vec[12]
 
-    dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
+    stats::dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
 
     # Frequencies: vec[2:5]
 
@@ -162,15 +162,15 @@ dprior_JC_G = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b)) +
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b)) +
 
     # Gamma parameter: lambda = vec[1];
 
-    dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE);
+    stats::dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE);
 
 }
 
@@ -180,16 +180,16 @@ dpseprior_JC_G = function(vec, ref_par){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
 
     # Gamma parameter: lambda = vec[1]
 
-    dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE);
+    stats::dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE);
 
 }
 
@@ -203,15 +203,15 @@ dprior_HKY_G = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
 
     # Gamma parameter: lambda = vec[1];
 
-    dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE) +
+    stats::dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE) +
 
     # Rates: q = vec[7] (HKY); phi = vec[12];
 
@@ -229,24 +229,24 @@ dpseprior_HKY_G = function(vec, ref_par){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
 
     # Gamma parameter: lambda = vec[1]
 
-    dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE) +
+    stats::dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE) +
 
     # Rates: q = vec[7]
 
-    dgamma(vec[7], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE) +
+    stats::dgamma(vec[7], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE) +
 
     # rate mean: phi = vec[12]
 
-    dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
+    stats::dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
 
     # Frequencies: vec[2:5]
 
@@ -265,15 +265,15 @@ dprior_GTR_G = function(vec, pr_par){
 
   # branches: vec[14: ...]
 
-  sum(dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
+  sum(stats::dexp(vec[-c(1:13)], rate = 1/vec[13], log = TRUE)) +
 
     # mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = pr_par$a, scale = pr_par$b) ) +
 
     # Gamma parameter: lambda = vec[1];
 
-    dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE) +
+    stats::dgamma(vec[1], shape = pr_par$al, scale = pr_par$bl, log = TRUE) +
 
     # Rates: q = vec[6:10] (GTR); phi = vec[12];
 
@@ -291,24 +291,24 @@ dpseprior_GTR_G = function(vec, ref_par){
 
   # branches: vec[14: ...]
 
-  sum(dgamma(vec[-c(1:13)], shape = ref_par$at_r,
+  sum(stats::dgamma(vec[-c(1:13)], shape = ref_par$at_r,
              scale = ref_par$bt_r, log = TRUE)) +
 
     #  mean branch: mu = vec[13];
 
-    log(dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
+    log(MCMCpack::dinvgamma(vec[13], shape = ref_par$a_r, scale = ref_par$b_r) ) +
 
     # Gamma parameter: lambda = vec[1]
 
-    dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE) +
+    stats::dgamma(vec[1], shape = ref_par$al_r, scale = ref_par$bl_r, log = TRUE) +
 
     # Rates: q = vec[6:10] (GTR)
 
-    sum(dgamma(vec[6:10], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE)) +
+    sum(stats::dgamma(vec[6:10], shape = ref_par$aq_r, scale = ref_par$bq_r, log = TRUE)) +
 
     # rate mean: phi = vec[12]
 
-    dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
+    stats::dgamma(vec[12], shape = ref_par$aphi_r, scale = ref_par$bphi_r, log = TRUE) +
 
     # Frequencies: vec[2:5]
 

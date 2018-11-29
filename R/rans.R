@@ -51,11 +51,11 @@ rans = function(R, S = 100, n_ns_outputs = 1,
 
     print(j);
 
-    us        = rbeta(n, shape1 = N, shape2 = 1);
+    us        = stats::rbeta(n, shape1 = N, shape2 = 1);
 
     logX      = cumsum(log(us));
 
-    aux       = us * c(us[-1], rbeta(1,shape1 = N, shape2 = 1));
+    aux       = us * c(us[-1], stats::rbeta(1,shape1 = N, shape2 = 1));
 
     lw        = c(0, logX[-n]) + log(1 - aux) - log(2); # Trapezoidal rule
 
@@ -78,7 +78,7 @@ rans = function(R, S = 100, n_ns_outputs = 1,
     sam      = sample(1:n, size = M, replace = TRUE, prob = postW / max(postW));
     #sam      = sample.lp(1:n, size = M, logpbb = logPostW);
 
-    sim      = as.matrix(Theta[sam, ]);
+    sim     = as.matrix(Theta[sam, ]);
 
     sim_mu  = rbind(sim_mu, apply(sim, 2, mean));
 

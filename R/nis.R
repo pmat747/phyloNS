@@ -23,8 +23,8 @@ dpselike = function(data, tree, vec, ref_par, pr_par,
 
     #tree$edge.length = vec[-c(1:13)];
 
-    like = pml(tree, data, Q = vec[6:11], bf = vec[2:5],
-               shape = vec[1], k = k)$logLik;
+    like = phangorn::pml(tree, data, Q = vec[6:11], bf = vec[2:5],
+                         shape = vec[1], k = k)$logLik;
 
   }else{
 
@@ -64,7 +64,7 @@ ref_gen = function(data, tree, vec0, inf0, worstLike,
 
   # Random numbers
 
-  u = runif(step);
+  u = stats::runif(step);
 
   pos = sample(x = spe$pos, size = step, replace = TRUE, prob = spe$prob);
 
@@ -266,9 +266,9 @@ nis = function( data, tree, N = 1, k = 4,
   a_r  = (post_mean[13] / post_sd[13] )^2 + 2;
   b_r  = post_mean[13] * ((post_mean[13] / post_sd[13] )^2 + 1);
 
-  obj_par[, 13] = rinvgamma(N, shape = a_r, scale = b_r); # active points
+  obj_par[, 13] = MCMCpack::rinvgamma(N, shape = a_r, scale = b_r); # active points
 
-  mu_w = rinvgamma(2000, shape = a_r, scale = b_r);
+  mu_w = MCMCpack::rinvgamma(2000, shape = a_r, scale = b_r);
 
   mu_w = max(mu_w) - min(mu_w); # sampling prior width
 
@@ -283,15 +283,15 @@ nis = function( data, tree, N = 1, k = 4,
 
   for(i in 1:n_brs){
 
-    t = cbind(t, rgamma(N, shape = at_r[i], scale = bt_r[i]));
+    t = cbind(t, stats::rgamma(N, shape = at_r[i], scale = bt_r[i]));
 
   }
 
   obj_par[, 14:(13+n_brs)] = t; # active points
 
-  t_w = qgamma(0.999, shape = at_r, scale = bt_r, lower.tail = TRUE) -
+  t_w = stats::qgamma(0.999, shape = at_r, scale = bt_r, lower.tail = TRUE) -
 
-        qgamma(0.001, shape = at_r, scale = bt_r, lower.tail = TRUE); # width
+        stats::qgamma(0.001, shape = at_r, scale = bt_r, lower.tail = TRUE); # width
 
   ref_par = list(a_r = a_r, b_r = b_r, at_r = at_r, bt_r = bt_r); # ref par
 
@@ -313,12 +313,12 @@ nis = function( data, tree, N = 1, k = 4,
     ref_par$al_r = al_r; # reference paramaters
     ref_par$bl_r = bl_r; # reference paramaters
 
-    lambda_w = qgamma(0.999, shape = al_r, scale = bl_r, lower.tail = TRUE) -
-               qgamma(0.001, shape = al_r, scale = bl_r, lower.tail = TRUE);
+    lambda_w = stats::qgamma(0.999, shape = al_r, scale = bl_r, lower.tail = TRUE) -
+               stats::qgamma(0.001, shape = al_r, scale = bl_r, lower.tail = TRUE);
 
     spe$lambda_w = lambda_w; # prior sampling width
 
-    obj_par[, 1] = rgamma(N, shape = al_r, scale = bl_r); # active points
+    obj_par[, 1] = stats::rgamma(N, shape = al_r, scale = bl_r); # active points
 
     # preventing from crashing
 
@@ -326,7 +326,7 @@ nis = function( data, tree, N = 1, k = 4,
 
       while( obj_par[i, 1] < 0.07 ){ # It could even crush with 0.07464181
 
-        obj_par[i, 1] = rgamma(1, shape = al_r, scale = bl_r);
+        obj_par[i, 1] = stats::rgamma(1, shape = al_r, scale = bl_r);
 
       }
     }
@@ -360,13 +360,13 @@ nis = function( data, tree, N = 1, k = 4,
 
     ref_par$f_r = f_r; # reference parameter
 
-    f_w = rdirichlet(1000, f_r);
+    f_w = MCMCpack::rdirichlet(1000, f_r);
 
     f_w = apply(f_w, 2, max) - apply(f_w, 2, min);
 
     spe$f_w = f_w; # width
 
-    obj_par[, 2:5] = rdirichlet(N, f_r); # active points
+    obj_par[, 2:5] = MCMCpack::rdirichlet(N, f_r); # active points
 
     ### Rates ###
 
@@ -376,24 +376,24 @@ nis = function( data, tree, N = 1, k = 4,
     ref_par$aphi_r = aphi_r; # reference parameter
     ref_par$bphi_r = bphi_r; # reference parameter
 
-    phi_w = qgamma(0.999, shape = aphi_r, scale = bphi_r, lower.tail = TRUE) -
-            qgamma(0.001, shape = aphi_r, scale = bphi_r, lower.tail = TRUE);
+    phi_w = stats::qgamma(0.999, shape = aphi_r, scale = bphi_r, lower.tail = TRUE) -
+            stats::qgamma(0.001, shape = aphi_r, scale = bphi_r, lower.tail = TRUE);
 
     spe$phi_w = phi_w; # width
 
-    obj_par[, 12] = rgamma(N, shape = aphi_r, scale = bphi_r); # active point
+    obj_par[, 12] = stats::rgamma(N, shape = aphi_r, scale = bphi_r); # active point
 
   if( m[1] == "H"){
 
     aq_r = (post_mean[7] / post_sd[7])^2;
     bq_r = (post_sd[7])^2 / post_mean[7];
 
-    q_w = qgamma(0.999, shape = aq_r, scale = bq_r, lower.tail = TRUE) -
-          qgamma(0.001, shape = aq_r, scale = bq_r, lower.tail = TRUE);
+    q_w = stats::qgamma(0.999, shape = aq_r, scale = bq_r, lower.tail = TRUE) -
+          stats::qgamma(0.001, shape = aq_r, scale = bq_r, lower.tail = TRUE);
 
     spe$q_w = c(NA, q_w); # width  (match position with HKY+G)
 
-    q = rgamma(N, shape = aq_r, scale = bq_r);
+    q = stats::rgamma(N, shape = aq_r, scale = bq_r);
 
     obj_par[,6:11] = cbind(rep(1,N), q, rep(1,N), rep(1,N), q, rep(1,N));#active points
 
@@ -402,8 +402,8 @@ nis = function( data, tree, N = 1, k = 4,
     aq_r = (post_mean[6:10] / post_sd[6:10])^2;
     bq_r = (post_sd[6:10])^2 / post_mean[6:10];
 
-    q_w = qgamma(0.999, shape = aq_r, scale = bq_r, lower.tail = TRUE) -
-          qgamma(0.001, shape = aq_r, scale = bq_r, lower.tail = TRUE);
+    q_w = stats::qgamma(0.999, shape = aq_r, scale = bq_r, lower.tail = TRUE) -
+          stats::qgamma(0.001, shape = aq_r, scale = bq_r, lower.tail = TRUE);
 
     spe$q_w = q_w; # width
 
@@ -411,7 +411,7 @@ nis = function( data, tree, N = 1, k = 4,
 
     for(i in 1:5){
 
-      q = cbind(q, rgamma(N, shape = aq_r[i], scale = bq_r[i]));
+      q = cbind(q, stats::rgamma(N, shape = aq_r[i], scale = bq_r[i]));
 
     }
 
@@ -431,7 +431,7 @@ nis = function( data, tree, N = 1, k = 4,
   spe$dprior    = dprior;    # prior function
   spe$dpseprior = dpseprior; # pseudo-prior function
   spe$n_taxa = n_taxa;
-  spe$n_brs = n_brs;
+  spe$n_brs  = n_brs;
   spe$model  = model;
   spe$pos    = v$pos;  # positions to sample
   spe$prob   = v$prob; # ppb to sample each parameter

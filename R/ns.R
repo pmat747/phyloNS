@@ -221,7 +221,7 @@ proposal <- function(vec, pos, model, prior_width){
 
   # abs acts as reflection for negative values
   out = abs(vec[pos] + prior_width * 10.0^(1.5 -
-                                             3.0 * abs(rt(1, df = 2))) * rnorm(1));
+                                             3.0 * abs(stats::rt(1, df = 2))) * stats::rnorm(1));
 
   vec[pos] = out;
 
@@ -248,7 +248,7 @@ proposal <- function(vec, pos, model, prior_width){
     while( out < 0.10 ){ # Gamma parameter (0.14)
 
       out = abs(vec[pos] + prior_width * 10.0^(1.5 -
-                                                 3.0 * abs(rt(1, df = 2))) * rnorm(1));
+            3.0 * abs(stats::rt(1, df = 2))) * stats::rnorm(1));
     }
 
     vec[pos] = out;
@@ -264,7 +264,7 @@ genValue <- function(data, tree, vec0, l0, worstLike,
 
   # Random numbers
 
-  u = runif(step);
+  u = stats::runif(step);
 
   pos = sample(x = spe$pos, size = step, replace = TRUE, prob = spe$prob);
 
@@ -310,8 +310,8 @@ genValue <- function(data, tree, vec0, l0, worstLike,
 
       }
 
-      l1 = pml(tree, data, Q = vec1[6:11], bf = vec1[2:5],
-               shape = vec1[1], k = k)$logLik;
+      l1 = phangorn::pml(tree, data, Q = vec1[6:11], bf = vec1[2:5],
+                         shape = vec1[1], k = k)$logLik;
     }
 
     p1   = spe$log_prior(vec1, a, b, al, bl, spe$n_brs);
@@ -402,7 +402,7 @@ genValue <- function(data, tree, vec0, l0, worstLike,
 # Frequencies (Dirichlet(1,1,1,1))
 
 ns = function( data, tree, N = 5, k = 4,
-               a = 3, b = 0.2, al = 10, bl = 0.026,
+               a = 3, b = 0.2, al = 1, bl = 1,
                step = 50, max.iter = 2000, end = 2,
                act_plot = TRUE, model){
 
@@ -438,7 +438,7 @@ ns = function( data, tree, N = 5, k = 4,
 
   n_taxa = length(data); # number of taxa/leaves
 
-  if(is.rooted(tree) == TRUE){ # number of branches
+  if(ape::is.rooted(tree) == TRUE){ # number of branches
 
     n_brs = 2 * n_taxa - 2; # rooted case
 
@@ -454,9 +454,9 @@ ns = function( data, tree, N = 5, k = 4,
 
   # Branch lengths
 
-  mu = as.matrix(rinvgamma(N, shape = a, scale = b), ncol = 1);
+  mu = as.matrix(MCMCpack::rinvgamma(N, shape = a, scale = b), ncol = 1);
 
-  t  = t(apply(mu, 1, function(x)rexp(n_brs, rate = 1 / x) ));
+  t  = t(apply(mu, 1, function(x)stats::rexp(n_brs, rate = 1 / x) ));
 
   m  = unlist(strsplit(model, ""));
 
@@ -473,18 +473,18 @@ ns = function( data, tree, N = 5, k = 4,
     if( is.null(al) || is.null(bl) )
       stop('Provide full specified prior for the gamma shape parameter');
 
-    lambda_w = qgamma(0.999, shape = al, scale = bl, lower.tail = TRUE) -
-               qgamma(0.001, shape = al, scale = bl, lower.tail = TRUE);
+    lambda_w = stats::qgamma(0.999, shape = al, scale = bl, lower.tail = TRUE) -
+               stats::qgamma(0.001, shape = al, scale = bl, lower.tail = TRUE);
 
     spe$lambda_w = lambda_w; # prior width
 
-    lambda = rgamma(N, shape = al, scale = bl); # JC_G HKY_G GTR_G
+    lambda = stats::rgamma(N, shape = al, scale = bl); # JC_G HKY_G GTR_G
 
     for(i in 1:N){ # It prevents 'phangorn' from crushing
 
       while( lambda[i] < 0.07 ){ # It could even crush with 0.07464181
 
-        lambda[i] = rgamma(1, shape = al, scale = bl);
+        lambda[i] = stats::rgamma(1, shape = al, scale = bl);
 
       }
     }
@@ -494,7 +494,7 @@ ns = function( data, tree, N = 5, k = 4,
 
   if( m[1] != "J"){
 
-    freq  = matrix( rexp( N * 4, 1), ncol = 4);
+    freq  = matrix( stats::rexp( N * 4, 1), ncol = 4);
 
     freq  = freq / apply(freq, 1, sum); # Dirichlet(1,1,1,1)
 
@@ -513,17 +513,17 @@ ns = function( data, tree, N = 5, k = 4,
 
   }else if( m[1] == "H" ){
 
-    phi =  as.matrix(rexp(N), ncol = 1);
+    phi =  as.matrix(stats::rexp(N), ncol = 1);
 
-    q   = c(apply(phi, 1, function(x)rexp(n = 1, rate = x)));
+    q   = c(apply(phi, 1, function(x)stats::rexp(n = 1, rate = x)));
 
     q   = cbind(rep(1, N), q, rep(1, N), rep(1, N), q, rep(1, N));
 
   }else if( m[1] == "G" ){
 
-    phi =  as.matrix(rexp(N), ncol = 1);
+    phi =  as.matrix(stats::rexp(N), ncol = 1);
 
-    q   = t(apply(phi, 1, function(x)rexp(n = 5, rate = x)));
+    q   = t(apply(phi, 1, function(x)stats::rexp(n = 5, rate = x)));
 
     q   = cbind(q, rep(1,N));
 
@@ -537,7 +537,7 @@ ns = function( data, tree, N = 5, k = 4,
 
   # prior width
 
-  mu_w = rinvgamma(2000, shape = a, scale = b)
+  mu_w = MCMCpack::rinvgamma(2000, shape = a, scale = b)
 
   mu_w = max(mu_w) - min(mu_w); # mu
 
@@ -555,7 +555,7 @@ ns = function( data, tree, N = 5, k = 4,
 
   logL    = apply(obj_par, 1, function(x){
                                      tree$edge.length = x[-c(1:13)];
-                                     pml(tree, data, Q = x[6:11],
+                                     phangorn::pml(tree, data, Q = x[6:11],
                                      bf = x[2:5], shape = x[1], k = k)$logLik});
   # definitions
 
@@ -656,18 +656,18 @@ ns = function( data, tree, N = 5, k = 4,
 
   if(act_plot){
 
-    par(mar = c(4,4,4,4));
+    graphics::par(mar = c(4,4,4,4));
 
-    plot(logX, logLd, xlab = expression("log"* xi), ylab='log(L)', pch='.');
+    graphics::plot(logX, logLd, xlab = expression("log"* xi), ylab='log(L)', pch='.');
 
-    plot(logX, Lw.z, xlab = expression("log"* xi), ylab = 'Weight for posterior');
+    graphics::plot(logX, Lw.z, xlab = expression("log"* xi), ylab = 'Weight for posterior');
 
     meanBranch = apply(sampled_par[, - c(1:13)], 2, mean);
 
     tree$edge.length = meanBranch;
 
-    plotTree(ladderize(tree)); # phytool package ape respectively
-    add.scale.bar(cex = 0.7, font = 1) # ape package
+    phytools::plotTree(ape::ladderize(tree)); # phytool package ape respectively
+    ape::add.scale.bar(cex = 0.7, font = 1) # ape package
 
   }
 

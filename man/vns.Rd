@@ -7,7 +7,7 @@
 \usage{
 vns(data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
     step = 50, max.iter = 2000, end = 2, act_plot = TRUE, model,
-    fiX = TRUE, pbb_rSPR = 0.5)
+    pbb_rSPR = 0.5)
 }
 \arguments{
   \item{data}{An alignment, object of class \code{phyDat}.}

@@ -1,3 +1,6 @@
 export(ns, nis, vns, rans)
-import(phangorn, ape, MCMCpack, phytools)
+import(phangorn, MCMCpack, phytools)
+import(stats)
+importFrom(graphics, plot, par, hist, title)
+#importFrom(ape, rtree, rotateConstr, read.tree, root, write.tree, ladderize, add.scale.bar, is.rooted)
 

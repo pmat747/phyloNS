@@ -66,7 +66,7 @@ pos_sam_vt = function(model, n_brs, t_pos, m = 1){
 
   }else if(model == "GTR_G"){
 
-    pos = c(1, 2:5, 6:10, 12, 13, 14:(13 + n_brs), t_pos);
+    pos  = c(1, 2:5, 6:10, 12, 13, 14:(13 + n_brs), t_pos);
     prob = c(rep(1,12 + n_brs), m);
 
   }
@@ -121,11 +121,11 @@ freq_tree = function(trees){
 
   maxTree = tree[[ which(freq == max(freq)) ]];
 
-  maxTree = read.tree(text = write.tree(ladderize(maxTree)));
+  maxTree = ape::read.tree(text = ape::write.tree(ape::ladderize(maxTree)));
 
   tree = lapply(tree, function(x)
-    read.tree(text =
-                write.tree(rotateConstr(x, maxTree$tip.label))));
+                ape::read.tree(text =
+                ape::write.tree(ape::rotateConstr(x, maxTree$tip.label))));
 
   class(tree) = "multiPhylo";
 
@@ -293,13 +293,13 @@ proposal_vt <- function(vec, tree, pos, model, t_pos,
   if( (pos >= 14) && (pos < t_pos) ){
 
     out = abs(tree$edge.length[pos-13] + prior_width * 10.0^(1.5 -
-                                                               3.0 * abs(rt(1, df = 2))) * rnorm(1));
+              3.0 * abs(stats::rt(1, df = 2))) * stats::rnorm(1));
 
     tree$edge.length[pos-13] = out; # Branches
 
   }else if( pos == t_pos){
 
-    if( runif(1) < pbb_rSPR ){
+    if( stats::runif(1) < pbb_rSPR ){
 
       mov_k = NULL; # rSPR
 
@@ -313,9 +313,9 @@ proposal_vt <- function(vec, tree, pos, model, t_pos,
 
       repeat{
 
-        ptree = rSPR(tree, move = 1, k = mov_k);
+        ptree = phangorn::rSPR(tree, moves = 1, k = mov_k);
 
-        if(is.rooted(ptree)){ # selecting only a rooted tree
+        if(ape::is.rooted(ptree)){ # selecting only a rooted tree
 
           tree = ptree;
           break
@@ -325,14 +325,14 @@ proposal_vt <- function(vec, tree, pos, model, t_pos,
 
     }else{
 
-      tree = rSPR(tree, move = 1, k = mov_k); # tree
+      tree = phangorn::rSPR(tree, moves = 1, k = mov_k); # tree
 
     }
   }else{
 
     # abs acts as reflection for negative values
     out = abs(vec[pos] + prior_width * 10.0^(1.5 -
-                                               3.0 * abs(rt(1, df = 2))) * rnorm(1));
+              3.0 * abs(stats::rt(1, df = 2))) * stats::rnorm(1));
 
     if( (pos >= 2) && ( pos <= 5) ){
 
@@ -359,7 +359,7 @@ proposal_vt <- function(vec, tree, pos, model, t_pos,
       while( out < 0.10 ){ # Gamma parameter (0.14)
 
         out = abs(vec[pos] + prior_width * 10.0^(1.5 -
-                                                   3.0 * abs(rt(1, df = 2))) * rnorm(1))
+                  3.0 * abs(stats::rt(1, df = 2))) * stats::rnorm(1))
 
       }
 
@@ -377,7 +377,7 @@ genValue_vt <- function(data, vec0, l0, worstLike,
 
   # Random numbers
 
-  u = runif(step);
+  u = stats::runif(step);
 
   pos = sample(x = spe$pos, size = step, replace = TRUE, prob = spe$prob);
 
@@ -397,7 +397,7 @@ genValue_vt <- function(data, vec0, l0, worstLike,
 
       r = 1/vec0$theta[13];
 
-      prior_width = qexp(0.99, rate = r ) - qexp(0.01, rate = r);
+      prior_width = stats::qexp(0.99, rate = r ) - stats::qexp(0.01, rate = r);
 
     }else if(ipos == 13){ prior_width = spe$mu_w;
 
@@ -409,7 +409,7 @@ genValue_vt <- function(data, vec0, l0, worstLike,
 
       r = vec0$theta[12];
 
-      prior_width = qexp(0.99, rate = r) - qexp(0.01, rate = r);
+      prior_width = stats::qexp(0.99, rate = r) - stats::qexp(0.01, rate = r);
 
     }else if(ipos == 12){ prior_width = 4;} # phi~Exp(1)=>dexp(0.99)-dexp(.01)>6
 
@@ -423,7 +423,7 @@ genValue_vt <- function(data, vec0, l0, worstLike,
 
     }else{
 
-      l1   = pml(vec1$tree, data, Q = vec1$theta[6:11],
+      l1   = phangorn::pml(vec1$tree, data, Q = vec1$theta[6:11],
                  bf = vec1$theta[2:5], shape = vec1$theta[1],
                  k = k)$logLik;
     }
@@ -523,7 +523,7 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   if( !any(model == models) )stop("The model is not defined");
 
-  rooted = FALSE; # This option could be useful in the future
+  rooted = FALSE; # This option could be useful in a future implementation
 
   if( rooted == FALSE){
 
@@ -565,9 +565,9 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   # Branch lengths
 
-  mu = as.matrix(rinvgamma(N, shape = a, scale = b), ncol = 1);
+  mu = as.matrix(MCMCpack::rinvgamma(N, shape = a, scale = b), ncol = 1);
 
-  t  = t(apply(mu, 1, function(x)rexp(n_brs, rate = 1 / x) ));
+  t  = t(apply(mu, 1, function(x)stats::rexp(n_brs, rate = 1 / x) ));
 
   m  = unlist(strsplit(model, ""));
 
@@ -584,19 +584,19 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
     if( is.null(al) || is.null(bl) )
       stop('Provide full specified prior for the gamma parameter');
 
-    lambda = rgamma(N, shape = al, scale = bl); # JC_G HKY_G GTR_G
+    lambda = stats::rgamma(N, shape = al, scale = bl); # JC_G HKY_G GTR_G
 
     for(i in 1:N){ # It prevents phangorn from crushing
 
       while( lambda[i] < 0.07 ){ # It could even crush with 0.07464181
 
-        lambda[i] = rgamma(1, shape = al, scale = bl)
+        lambda[i] = stats::rgamma(1, shape = al, scale = bl)
 
       }
     }
 
-    lambda_w = qgamma(0.999, shape = al, scale = bl, lower.tail = TRUE) -
-      qgamma(0.001, shape = al, scale = bl, lower.tail = TRUE); # Gamma par
+    lambda_w = stats::qgamma(0.999, shape = al, scale = bl, lower.tail = TRUE) -
+               stats::qgamma(0.001, shape = al, scale = bl, lower.tail = TRUE); # Gamma par
 
     spe$lambda_w = lambda_w;
 
@@ -606,7 +606,7 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   if( m[1] != "J"){
 
-    freq  = matrix( rexp( N * 4, 1), ncol = 4);
+    freq  = matrix( stats::rexp( N * 4, 1), ncol = 4);
 
     freq  = freq / apply(freq, 1, sum); # Dirichlet(1,1,1,1)
 
@@ -625,17 +625,17 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   }else if( m[1] == "H" ){
 
-    phi =  as.matrix(rexp(N), ncol = 1);
+    phi =  as.matrix(stats::rexp(N), ncol = 1);
 
-    q   = c(apply(phi, 1, function(x)rexp(n = 1, rate = x)));
+    q   = c(apply(phi, 1, function(x)stats::rexp(n = 1, rate = x)));
 
     q   = cbind(rep(1, N), q, rep(1, N), rep(1, N), q, rep(1, N));
 
   }else if( m[1] == "G" ){
 
-    phi =  as.matrix(rexp(N), ncol = 1);
+    phi =  as.matrix(stats::rexp(N), ncol = 1);
 
-    q   = t(apply(phi, 1, function(x)rexp(n = 5, rate = x)));
+    q   = t(apply(phi, 1, function(x)stats::rexp(n = 5, rate = x)));
 
     q   = cbind(q, rep(1,N));
 
@@ -651,7 +651,7 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   # prior width
 
-  mu_w = rinvgamma(2000, shape = a, scale = b)
+  mu_w = MCMCpack::rinvgamma(2000, shape = a, scale = b)
 
   mu_w = max(mu_w) - min(mu_w); # mu
 
@@ -680,13 +680,13 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
     ### prior sample trees ###
 
-    ptree = rtree(n_taxa, rooted = rooted);
+    ptree = ape::rtree(n_taxa, rooted = rooted);
     ptree$tip.label = sample(tips, n_taxa); # branch names
 
     ptree$edge.length = t[i, ]; # branch length
 
-    logL[i] = pml(ptree, data, Q = Obj_par[i,6:11], bf = Obj_par[i,2:5],
-                  shape = Obj_par[i,1], k = k)$logLik;
+    logL[i] = phangorn::pml(ptree, data, Q = Obj_par[i,6:11], bf = Obj_par[i,2:5],
+                            shape = Obj_par[i,1], k = k)$logLik;
 
     Obj_trees[[i]] = ptree;
 
@@ -724,7 +724,7 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
     logZ        <- log.plus(s_z[iter], lw[iter]);
 
     H           <- exp(lw[iter]-logZ)*logL[worst] - logZ +
-        exp(s_z[iter]-logZ)*(H+s_z[iter]);
+                   exp(s_z[iter]-logZ)*(H+s_z[iter]);
 
     s_z[iter+1] <- logZ; # Storing z history
 
@@ -824,9 +824,9 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
       if( fun(sampled_trees[[i]]) ){
 
-        aux = rotateConstr(sampled_trees[[i]], maxTree$tip.label);
+        aux = ape::rotateConstr(sampled_trees[[i]], maxTree$tip.label);
 
-        # aux = read.tree(text = write.tree(aux));
+        # aux = ape::read.tree(text = write.tree(aux));
 
         meanBranch = rbind(meanBranch, aux$edge.length);
 
@@ -839,11 +839,11 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
       if( fun(sampled_trees[[i]]) ){
 
-        aux = root(sampled_trees[[i]], maxTree$tip.label[1], resolve.root = F);
+        aux = ape::root(sampled_trees[[i]], maxTree$tip.label[1], resolve.root = F);
 
-        aux = rotateConstr(aux, maxTree$tip.label);
+        aux = ape::rotateConstr(aux, maxTree$tip.label);
 
-        aux = read.tree(text = write.tree(aux));
+        aux = ape::read.tree(text = ape::write.tree(aux));
 
         meanBranch = rbind(meanBranch, sampled_trees[[i]]$edge.length);
 
@@ -865,33 +865,33 @@ vns = function( data, N = 100, k = 4, a = 3, b = 0.2, al = NULL, bl = NULL,
 
   if(act_plot){
 
-    par(mar = c(4,4,4,4));
+    graphics::par(mar = c(4,4,4,4));
 
-    plot(logX,logLd, xlab = expression("log"* xi), ylab='log(L)', pch='.');
+    graphics::plot(logX,logLd, xlab = expression("log"* xi), ylab='log(L)', pch='.');
 
-    plot(logX,Lw.z, xlab = expression("log"* xi), ylab = 'Weight for posterior');
+    graphics::plot(logX,Lw.z, xlab = expression("log"* xi), ylab = 'Weight for posterior');
 
-    plot(samp_tree_length, type = 'l', xlab = 'Sample',
-         ylab = 'Posterior tree length')
+    graphics::plot(samp_tree_length, type = 'l', xlab = 'Sample',
+                   ylab = 'Posterior tree length')
 
-    plot(sampled_likes, type = 'l', xlab = 'Sample',
+    graphics::plot(sampled_likes, type = 'l', xlab = 'Sample',
          ylab = 'Log-likelihood')
 
     if(length(data) > 4 ){
 
       # consensus net is defined for more than 4 taxa
 
-      cnt  = consensusNet(sampled_trees); # phangorn
+      cnt  = phangorn::consensusNet(sampled_trees); # phangorn
 
-      plot(cnt, "2", tip.color = "black", edge.width = 1, font = 1,
-           show.nodes = TRUE, type = "2D");
+      graphics::plot(cnt, "2", tip.color = "black", edge.width = 1, font = 1,
+                     show.nodes = TRUE, type = "2D");
 
-      title("Consensus Network");
+      graphics::title("Consensus Network");
 
     }
 
-    plotTree(ladderize(maxTree), main = "Maximum posterior tree"); # phytool package ape respectively
-    add.scale.bar(cex = 0.7, font = 1) # ape package
+    phytools::plotTree(ape::ladderize(maxTree), main = "Maximum posterior tree"); # phytool package ape respectively
+    ape::add.scale.bar(cex = 0.7, font = 1) # ape package
 
   }
 

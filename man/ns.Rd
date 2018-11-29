@@ -23,7 +23,6 @@ ns(data, tree, N = 5, k = 4, a = 3, b = 0.2, al = 1, bl = 1,
   \item{end}{Factor in the termination criterion, see details.}
   \item{act_plot}{Allows to produce relevant plots, including the tree with the posterior means as branch lengths.}
   \item{model}{Allows to choose a nucleotide model, see details.}
-  \item{}{}
 }
 \details{
 Specific priors have been assigned over the parameters, but they offer some degree of flexibility.  For the branch lengths, the following hierarchical structure is considered:
